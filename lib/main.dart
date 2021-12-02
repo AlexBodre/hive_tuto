@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart' as path_provider;
 
 import 'contact_page.dart';
 import 'models/contact.dart';
 
 void main() async {
-  final appDocumentDirectory =
-      await path_provider.getApplicationDocumentsDirectory();
-  Hive.init(appDocumentDirectory.path);
+  await Hive.initFlutter();
   Hive.registerAdapter(ContactAdapter());
   runApp(MyApp());
 }
@@ -25,7 +22,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Hive Tutorial',
       home: FutureBuilder(
-        future: Hive.openBox(
+        future: Hive.openBox<Contact>(
           'contacts',
           compactionStrategy: (int total, int deleted) {
             return deleted > 20;
@@ -46,7 +43,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    Hive.box('contacts').compact();
+    Hive.box<Contact>('contacts').compact();
     Hive.close();
     super.dispose();
   }
